@@ -22,8 +22,8 @@ A comprehensive system for automated book publication featuring web scraping, AI
 
 ### 1. Clone the Repository
 ```bash
-git clone <your-repo-url>
-cd project ai
+git clone https://github.com/soumya031/autometed-book-publisher
+cd autometed-book-publisher
 ```
 
 ### 2. Install Python Dependencies
