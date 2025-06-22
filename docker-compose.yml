@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  ai-book-workflow:
+    build: .
+    container_name: ai-book-publication-workflow
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    volumes:
+      - ./chroma_db:/app/chroma_db
+      - ./output:/app/output
+      - ./.env:/app/.env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - ai-workflow-network
+
+  # Optional: Add a reverse proxy for production
+  nginx:
+    image: nginx:alpine
+    container_name: ai-workflow-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - ai-book-workflow
+    restart: unless-stopped
+    networks:
+      - ai-workflow-network
+    profiles:
+      - production
+
+networks:
+  ai-workflow-network:
+    driver: bridge
+
+volumes:
+  chroma_data:
+  output_data: 
